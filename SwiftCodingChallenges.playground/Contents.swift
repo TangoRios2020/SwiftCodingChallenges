@@ -336,7 +336,7 @@ func challenge14(string: String, current: String = "") {
     }
 }
 
-challenge14(string: "abc", current: "a")
+//challenge14(string: "abc", current: "a")
 
 /*:
  Challenge 15: Reverse the words in a string
@@ -351,3 +351,245 @@ func challenge15(input: String) -> String {
 }
 
 challenge15(input: "The quick brown fox")
+
+/*:
+ Chapter 2 Numbers
+ */
+
+/*:
+ Challenge 16: Fizz Buzz
+ */
+
+func challenge16a() {
+    for i in 1...100 {
+        if i % 3 == 0 && i % 5 == 0 {
+            print("Fuzz Buzz")
+        } else if i % 3 == 0 {
+            print("Fuzz")
+        } else if i % 5 == 0 {
+            print("Buzz")
+        } else {
+            print(i)
+        }
+    }
+}
+
+//challenge16a()
+
+func challenge16b() {
+    (1...100).forEach {
+        print($0 % 3 == 0 ? $0 % 5 == 0 ? "Fuzz Buzz" : "Fuzz" :
+            $0 % 5 == 0 ? "Buzz" : "\($0)")
+    }
+}
+
+//challenge16b()
+
+/*:
+ Challenge 17: Generate a random number in a range
+ arc4random_uniform()
+ */
+
+func challenge17(min: Int, max: Int) -> Int {
+    return Int(arc4random_uniform(UInt32(max - min + 1))) + min
+}
+
+challenge17(min: 30, max: 49)
+
+/*:
+ Challenge 18: Recreate the pow() function
+ */
+
+func challenge18(number: Int, power: Int) -> Int {
+    guard number > 0, power > 0 else {
+        return 0
+    }
+    
+    var returnValue = number
+    for _ in 1..<power {
+        returnValue *= number
+    }
+    return returnValue
+}
+
+challenge18(number: 3, power: 3)
+
+func challenge18b(number: Int, power: Int) -> Int {
+    guard number > 0, power > 0 else {
+        return 0
+    }
+    if power == 1 {
+        return number
+    }
+    
+    return number * challenge18(number: number, power: power - 1)
+}
+
+challenge18(number: 3, power: 3)
+
+/*:
+ Challenge 19: Swap two numbers
+ without using a temporary variable.
+ */
+
+func challenge19(inputA: Int, inputB: Int) {
+//    a += b, a ^= b, (a, b) = (b, a)
+    var inputA = inputA, inputB = inputB
+    inputA = inputA + inputB
+    inputB = inputA - inputB
+    inputA = inputA - inputB
+}
+
+challenge19(inputA: 39, inputB: 45)
+
+/*:
+ Challenge 20: Number is prime
+ */
+
+func challenge20(input: Int) -> Bool {
+    guard input >= 2 else {
+        return false
+    }
+    
+    for i in 2..<input {
+        if input % i == 0 {
+            return false
+        }
+    }
+    
+    return true
+}
+
+challenge20(input: 23)
+
+/*:
+ Challenge 21: Counting binary ones
+ #### Create a function that accepts any positive integer and returns the next highest and next lowest number that has the same number of ones in its binary representation. If either number is not possible, return nil for it.
+ */
+
+func challenge21(number: Int) -> (nextHighest: Int?, nextLowest: Int?) {
+    func ones(in number: Int) -> Int {
+        let currentBinary = String(number, radix: 2)
+        return currentBinary.filter { (char: Character) -> Bool
+            in char == "1" }.count
+    }
+    
+    let targetOnes = ones(in: number)
+    var nextHighest: Int? = nil
+    var nextLowest: Int? = nil
+    for i in number + 1...Int.max {
+        if ones(in: i) == targetOnes {
+            nextHighest = i
+            break
+        }
+    }
+    
+    for i in (0 ..< number).reversed() {
+        if ones(in: i) == targetOnes {
+            nextLowest = i
+            break
+        }
+    }
+    
+    return (nextHighest, nextLowest)
+}
+
+challenge21(number: 39)
+
+/*:
+ Challenge 22: Binary reverse
+ */
+
+func challenge22(number: UInt) -> UInt {
+    let binary = String(number, radix: 2)
+    let paddingAmount = 8 - binary.count
+    let paddedBinary = String(repeating: "0", count: paddingAmount) + binary
+    let reversedBinary = String(paddedBinary.reversed())
+    return UInt(reversedBinary, radix: 2)!
+}
+
+challenge22(number: 32)
+challenge22(number: 127)
+
+/*:
+ Challenge 23: Integer disguised as string
+ */
+
+func challenge23a(input: String) -> Bool {
+    for letter in input {
+        if Int(String(letter)) == nil {
+            return false
+        }
+    }
+    return true
+}
+
+challenge23a(input: "9223372036854775808")
+challenge23a(input: "92233720368547758080000000")
+
+func challenge23b(input: String) -> Bool {
+    return input.rangeOfCharacter(from:
+        CharacterSet(charactersIn: "0123456789").inverted) == nil
+}
+
+challenge23b(input: "9223372036854775808")
+challenge23b(input: "92233720368547758080000000")
+
+/*:
+ Challenge 24: Add numbers inside a string
+ */
+
+func challenge24a(string: String) -> Int {
+    var currentNumber = ""
+    var sum = 0
+    for letter in string {
+        let strLetter = String(letter)
+        if Int(strLetter) != nil {
+            currentNumber += strLetter
+        } else {
+            sum += Int(currentNumber) ?? 0
+            currentNumber = ""
+        }
+    }
+    sum += Int(currentNumber) ?? 0
+    return sum
+}
+
+challenge24a(string: "a10b20c30")
+
+/*:
+ Challenge 25: Calculate a square root by hand
+ */
+
+func challenge25(input: Int) -> Int {
+    guard input != 1 else { return 1 }
+    var lowerBound = 0
+    var upperBound = 1 + input / 2
+    
+    while lowerBound + 1 < upperBound {
+        let middle = lowerBound + (upperBound - lowerBound) / 2
+        let middleSquared = middle * middle
+        
+        if middleSquared == input {
+            return middle
+        } else if middleSquared < input {
+            lowerBound = middle
+        } else {
+            upperBound = middle
+        }
+    }
+    return lowerBound
+}
+
+challenge25(input: 99)
+
+/*:
+ Challenge 26: Subtract without subtract
+ #### Create a function that subtracts one positive integer from another, without using -.
+ */
+
+func challenge26(subtract: Int, from: Int) -> Int {
+    return from + (~subtract + 1)
+}
+
+challenge26(subtract: 34, from: 23)
